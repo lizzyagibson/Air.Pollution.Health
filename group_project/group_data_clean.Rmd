@@ -1,0 +1,162 @@
+---
+title: "NYC Air Pollution"
+author: "Lizzy Gibson"
+date: "April 22, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(stringr)
+library(forcats)
+library(rvest)
+library(httr)
+library(janitor)
+library(leaflet)
+```
+
+# Clean Data
+
+EPA Air Quality System Data from: https://aqs.epa.gov/aqsweb/airdata/download_files.html.
+
+## Download 
+
+### Criteria Gases
+
+```{r download_2015}
+tmp <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_44201_2015.zip", write_disk(tmp))
+ozone <- unzip(tmp) %>% read_csv() %>% clean_names()
+
+tmp2 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_42401_2015.zip", write_disk(tmp2))
+so2 <- unzip(tmp2) %>% read_csv() %>% clean_names()
+
+tmp3 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_42101_2015.zip", write_disk(tmp3))
+co <- unzip(tmp3) %>% read_csv() %>% clean_names()
+
+tmp4 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_42602_2015.zip", write_disk(tmp4))
+no2 <- unzip(tmp4) %>% read_csv() %>% clean_names()
+```
+
+### Particulates
+
+```{r download_particulates}
+tmp11 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_88101_2015.zip", write_disk(tmp11))
+pm_25_FRM_FEM_mass <- unzip(tmp11) %>% read_csv() %>% clean_names()
+
+tmp22 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_88502_2015.zip", write_disk(tmp22))
+pm_25_non_FRM_FEM_mass <- unzip(tmp22) %>% read_csv() %>% clean_names()
+
+tmp33 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_81102_2015.zip", write_disk(tmp33))
+pm_10 <- unzip(tmp33) %>% read_csv() %>% clean_names()
+
+tmp44 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_SPEC_2015.zip", write_disk(tmp44))
+pm_25_spec <- unzip(tmp44) %>% read_csv() %>% clean_names()
+```
+
+### Meteorological
+
+```{r download_meteor}
+tmp111 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_WIND_2015.zip", write_disk(tmp111))
+winds <- unzip(tmp111) %>% read_csv() %>% clean_names()
+
+tmp222 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_TEMP_2015.zip", write_disk(tmp222))
+temp <- unzip(tmp222) %>% read_csv() %>% clean_names()
+
+tmp333 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_PRESS_2015.zip", write_disk(tmp333))
+barometric_press <- unzip(tmp333) %>% read_csv() %>% clean_names()
+
+tmp444 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_RH_DP_2015.zip", write_disk(tmp444))
+rh_dewpoint <- unzip(tmp444) %>% read_csv() %>% clean_names()
+```
+
+### Toxics, Precursors, and Lead
+
+```{r download_tox}
+tmp1111 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_HAPS_2015.zip", write_disk(tmp1111))
+haps <- unzip(tmp1111) %>% read_csv() %>% clean_names()
+
+tmp2222 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_VOCS_2015.zip", write_disk(tmp2222))
+vocs <- unzip(tmp2222) %>% read_csv() %>% clean_names()
+
+tmp3333 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_NONOxNOy_2015.zip", write_disk(tmp3333))
+nox <- unzip(tmp3333) %>% read_csv() %>% clean_names()
+
+tmp4444 <- tempfile()   
+GET("https://aqs.epa.gov/aqsweb/airdata/daily_LEAD_2015.zip", write_disk(tmp4444))
+lead <- unzip(tmp4444) %>% read_csv() %>% clean_names()
+```
+
+## Merge
+
+```{r merge}
+toxics <- rbind(rbind(rbind(haps, vocs), nox), lead) %>% 
+  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond"))
+
+meteor <- rbind(rbind(rbind(winds, temp), barometric_press), rh_dewpoint) %>% 
+  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond"))
+
+partic <- rbind(rbind(rbind(pm_25_FRM_FEM_mass, pm_25_non_FRM_FEM_mass), pm_10), pm_25_spec) %>% 
+  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond"))
+
+criteria <- rbind(rbind(rbind(ozone, so2), co), no2) %>% 
+  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond"))
+
+all <- rbind(rbind(rbind(toxics, meteor), partic), criteria)
+
+all <- all %>% select(date_local, latitude, longitude, parameter_name, 
+               arithmetic_mean, x1st_max_value)
+
+data <- all %>% select(-x1st_max_value) %>% group_by(date_local, parameter_name) %>% 
+  summarize(mean = mean(arithmetic_mean)) %>% 
+  spread(parameter_name, mean) %>% clean_names()
+
+aqs <- data %>% filter(!is.na(x1_pentene))
+```
+
+## Monitor Stations
+
+```{r map}
+all %>% select(latitude, longitude) %>% unique() %>% 
+  leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitude, ~latitude, color = "red")
+```
+
+## Heat Map
+
+```{r heat_map}
+plot <- aqs %>% ungroup() %>% select(-date_local) %>% as.matrix()
+
+cormat <- round(cor(plot, use = "pairwise.complete.obs", method = c("spearman")),2)
+
+melted_cormat <- melt(cormat) %>% rename(Correlation = value)
+
+ggplot(data = melted_cormat, aes(x = Var1, y = Var2)) + 
+  geom_tile(aes(fill = Correlation), colour = "white") + 
+  scale_fill_gradient2(low = "#00BFC4", mid = "white", high = "#F8766D", 
+                       midpoint = 0, 
+                      na.value = "transparent", limits = c(-1, 1)) +
+  theme_grey() + labs(x = "", y = "") + 
+  scale_x_discrete(expand = c(0, 0)) + 
+  scale_y_discrete(expand = c(0, 0)) + 
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank(),
+        panel.spacing = unit(0, "lines"),
+        strip.background = element_blank(),
+        strip.placement = "outside", legend.position = "bottom") 
+```
