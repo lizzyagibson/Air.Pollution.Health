@@ -1,0 +1,43 @@
+---
+title: "NYC Respiratory Hospital Visits"
+author: "Lizzy Gibson"
+date: "April 27, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(stringr)
+library(forcats)
+library(rvest)
+library(httr)
+library(janitor)
+library(leaflet)
+library(reshape2)
+```
+
+## Clean
+
+This gives us counts of respiratory inpatient hospital visits per day across all 5 NYC boroughs.
+
+```{r download}
+sparcs <- read_csv("NYCInpatient.csv") %>% clean_names() %>% 
+  mutate(date = as.Date(as.character(admission_start_care_date), "%Y%m%d")) %>% 
+  select(-admission_start_care_date) %>% 
+  group_by(date) %>% 
+  summarize(resp = sum(resp))
+```
+
+## Merge
+
+Merge NYC SPARCS hospital visit data from 2015 with EPA AQS exposure data.
+
+```{r merge}
+aqs <- read_csv("aqs_2015.csv") %>% clean_names()
+
+data <-  left_join(sparcs, aqs, by = "date")
+```
+
+
+
