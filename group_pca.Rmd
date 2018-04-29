@@ -20,11 +20,12 @@ library(ISLR)
 
 ## PCA
 
+A low-dimensional representation of the data that captures as much of the information as possible. The idea is that each of the n observations lives in p-dimensional space, but not all of these dimensions are equally interesting. PCA seeks a small number of dimensions that are as interesting as possible, where the concept of interesting is measured by the amount that the observations vary along each dimension. Each of the dimensions found by PCA is a linear combination of the p features. The first two principal components of a data set span the plane that is closest to the n observations, in terms of average squared Euclidean distance.
+
 ```{r data}
 #remove outcome and confounders from PCA matrix
-unsup <- data %>% select(-resp, -day_of_week, -outdoor_temperature, -relative_humidity)
-#make date rowname
-unsup <- unsup %>% as.data.frame() %>% column_to_rownames(var = "date")
+unsup <- data %>% select(-resp, -day_of_week, 
+                         -outdoor_temperature, -relative_humidity, -date)
 ```
 
 ```{r}
@@ -62,6 +63,7 @@ pve = pr.var/sum(pr.var)
 pve
 # PVE
 
+#Scree plot
 plot(pve, xlab = "Principal Component", 
      ylab = "Proportion of Variance Explained", ylim = c(0,1), type = 'b')
 
@@ -71,4 +73,6 @@ a = c(1,2,8,-3)
 cumsum(a)
 
 ```
+
+The principal component score vectors have length n = 122 for 122 days, and the principal component loading vectors have length p = 23 for 23 criteria gases, particulates, and PM species measured. PCA was performed after standardizing each variable to have mean zero and standard deviation one.
 

@@ -28,35 +28,66 @@ Daily EPA Air Quality System Data for 2015 from: https://aqs.epa.gov/aqsweb/aird
 ```{r download_2015}
 tmp <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_44201_2015.zip", write_disk(tmp))
-ozone <- unzip(tmp) %>% read_csv() %>% clean_names()
+ozone <- unzip(tmp) %>% read_csv() %>% clean_names() %>% 
+  filter(state_name == "New York" & county_name %in% 
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 
 tmp2 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_42401_2015.zip", write_disk(tmp2))
-so2 <- unzip(tmp2) %>% read_csv() %>% clean_names()
+so2 <- unzip(tmp2) %>% read_csv() %>% clean_names() %>% 
+  filter(state_name == "New York" & county_name %in% 
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 
 tmp3 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_42101_2015.zip", write_disk(tmp3))
-co <- unzip(tmp3) %>% read_csv() %>% clean_names()
+co <- unzip(tmp3) %>% read_csv() %>% clean_names() %>% 
+  filter(state_name == "New York" & county_name %in% 
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 
 tmp4 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_42602_2015.zip", write_disk(tmp4))
-no2 <- unzip(tmp4) %>% read_csv() %>% clean_names()
+no2 <- unzip(tmp4) %>% read_csv() %>% clean_names() %>% 
+  filter(state_name == "New York" & county_name %in% 
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 ```
 
 ### Particulates
 
-Do not include PM10 or non-FRM (federal reference method).
+Do not include PM10 or non-FRM (non-federal reference method).
 
 ```{r download_particulates}
 tmp11 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_88101_2015.zip", write_disk(tmp11))
-pm_25_FRM_FEM_mass <- unzip(tmp11) %>% read_csv() %>% clean_names() %>% filter(poc == 1)
+pm_25_FRM_FEM_mass <- unzip(tmp11) %>% read_csv() %>% clean_names() %>% 
+  filter(state_name == "New York" & county_name %in% 
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 
 tmp44 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_SPEC_2015.zip", write_disk(tmp44))
-pm_25_spec <- unzip(tmp44) %>% read_csv() %>% clean_names()
-
-table(pm_25_spec$poc, pm_25_spec$parameter_name)
+pm_25_spec <- unzip(tmp44) %>% read_csv() %>% clean_names() %>% 
+  filter(state_name == "New York" & county_name %in% 
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & 
+           parameter_name %in% c("Sodium PM2.5 LC",
+                                             "Aluminum PM2.5 LC",
+                                             "Barium PM2.5 LC",
+                                             "Bromine PM2.5 LC",
+                                             "Calcium PM2.5 LC",
+                                             "Chlorine PM2.5 LC",
+                                             "Chromium PM2.5 LC",
+                                             "Copper PM2.5 LC",
+                                             "Iron PM2.5 LC",
+                                             "Lead PM2.5 LC",
+                                             "Manganese PM2.5 LC",
+                                             "Selenium PM2.5 LC",
+                                             "Nickel PM2.5 LC",
+                                             "Selenium PM2.5 LC",
+                                             "Silicon PM2.5 LC",
+                                             "Sulfur PM2.5 LC",
+                                             "Titanium PM2.5 LC",
+                                             "Vanadium PM2.5 LC",
+                                             "Zinc PM2.5 LC",
+                                             "Black Carbon PM2.5 at 880 nm"))
+table(pm_25_spec$poc)
 ```
 
 ### Meteorological
@@ -66,11 +97,15 @@ Do not include wind or barometric pressure.
 ```{r download_meteor}
 tmp222 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_TEMP_2015.zip", write_disk(tmp222))
-temp <- unzip(tmp222) %>% read_csv() %>% clean_names()
+temp <- unzip(tmp222) %>% read_csv() %>% clean_names() %>% 
+  filter(state_name == "New York" & county_name %in% 
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 
 tmp444 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_RH_DP_2015.zip", write_disk(tmp444))
-rh_dewpoint <- unzip(tmp444) %>% read_csv() %>% clean_names()
+rh_dewpoint <- unzip(tmp444) %>% read_csv() %>% clean_names() %>% 
+  filter(state_name == "New York" & county_name %in% 
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 ```
 
 ### Toxics, Precursors, and Lead
@@ -104,44 +139,17 @@ Ba
 Pb  
 
 ```{r merge}
-meteor <- rbind(rh_dewpoint, temp) %>% 
-  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
+meteor <- rbind(rh_dewpoint, temp)
+partic <- rbind(pm_25_FRM_FEM_mass, pm_25_spec)
+criteria <- rbind(rbind(rbind(ozone, so2), co), no2)
 
-partic <- rbind(pm_25_FRM_FEM_mass, pm_25_spec) %>% 
-  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond") & parameter_name %in% c("Sodium PM2.5 LC",
-                                             "Aluminum PM2.5 LC",
-                                             "Barium PM2.5 LC",
-                                             "Bromine PM2.5 LC",
-                                             "Calcium PM2.5 LC",
-                                             "Chlorine PM2.5 LC",
-                                             "Chromium PM2.5 LC",
-                                             "Copper PM2.5 LC",
-                                             "Iron PM2.5 LC",
-                                             "Lead PM2.5 LC",
-                                             "Manganese PM2.5 LC",
-                                             "Selenium PM2.5 LC",
-                                             "Nickel PM2.5 LC",
-                                             "Selenium PM2.5 LC",
-                                             "Silicon PM2.5 LC",
-                                             "Sulfur PM2.5 LC",
-                                             "Titanium PM2.5 LC",
-                                             "Vanadium PM2.5 LC",
-                                             "Zinc PM2.5 LC",
-                                             "Black Carbon PM2.5 at 880 nm",
-                                             "PM2.5 - Local Conditions"))
-
-criteria <- rbind(rbind(rbind(ozone, so2), co), no2) %>% 
-  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
-
-all <- rbind(rbind(criteria, meteor), partic)
-
-all <- all %>% select(date_local, latitude, longitude, parameter_name, 
-               arithmetic_mean)
+all <- rbind(rbind(criteria, meteor), partic) %>% 
+  select(date_local, latitude, longitude, parameter_name, arithmetic_mean)
 
 aqs <- all %>%
   rename(date = date_local) %>% 
   group_by(date, parameter_name) %>% 
-  summarize(mean = mean(arithmetic_mean)) %>% 
+  summarize(mean = mean(arithmetic_mean, na.rm = TRUE)) %>% 
   spread(parameter_name, mean) %>% clean_names() %>% 
   filter(!is.na(aluminum_pm2_5_lc))
 
