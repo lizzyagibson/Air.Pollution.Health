@@ -50,4 +50,9 @@ data <- data %>%
   mutate(day_of_week = weekdays(date)) %>% select(day_of_week, everything())
 ```
 
+## Final Dataset
+
+```{r}
+summary(data)
+```
 
