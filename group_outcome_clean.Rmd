@@ -36,8 +36,18 @@ Merge NYC SPARCS hospital visit data from 2015 with EPA AQS exposure data.
 ```{r merge}
 aqs <- read_csv("aqs_2015.csv") %>% clean_names()
 
-data <-  left_join(sparcs, aqs, by = "date")
+data <-  right_join(sparcs, aqs, by = "date")
 ```
 
+## Confounders
+
+The unit of analysis is day, and confounders can only be variables that vary from day to day, and covary with both exposure and outcome. Include temp, relative humidity, day of week, and time trends. What people usually do in time series is apply a natural spline on time (numerical days) with 4-6 df/yr for time trends. This will capture both seasonal trends, but also long-term trends (if you had > 1 years). 
+
+Temperature and relative humidity are also likely nonlinear confounders. For temperature we do lag 0 (same day) natural spline with df = 3, and average lag1-3 also ns with df = 3. For RH usually only lag0 ns df = 3. 
+
+```{r cov}
+data <- data %>% 
+  mutate(day_of_week = weekdays(date)) %>% select(day_of_week, everything())
+```
 
 

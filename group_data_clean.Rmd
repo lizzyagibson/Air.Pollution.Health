@@ -45,38 +45,28 @@ no2 <- unzip(tmp4) %>% read_csv() %>% clean_names()
 
 ### Particulates
 
+Do not include PM10 or non-FRM (federal reference method).
+
 ```{r download_particulates}
 tmp11 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_88101_2015.zip", write_disk(tmp11))
-pm_25_FRM_FEM_mass <- unzip(tmp11) %>% read_csv() %>% clean_names()
-
-tmp22 <- tempfile()   
-GET("https://aqs.epa.gov/aqsweb/airdata/daily_88502_2015.zip", write_disk(tmp22))
-pm_25_non_FRM_FEM_mass <- unzip(tmp22) %>% read_csv() %>% clean_names()
-
-tmp33 <- tempfile()   
-GET("https://aqs.epa.gov/aqsweb/airdata/daily_81102_2015.zip", write_disk(tmp33))
-pm_10 <- unzip(tmp33) %>% read_csv() %>% clean_names()
+pm_25_FRM_FEM_mass <- unzip(tmp11) %>% read_csv() %>% clean_names() %>% filter(poc == 1)
 
 tmp44 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_SPEC_2015.zip", write_disk(tmp44))
 pm_25_spec <- unzip(tmp44) %>% read_csv() %>% clean_names()
+
+table(pm_25_spec$poc, pm_25_spec$parameter_name)
 ```
 
 ### Meteorological
 
-```{r download_meteor}
-tmp111 <- tempfile()   
-GET("https://aqs.epa.gov/aqsweb/airdata/daily_WIND_2015.zip", write_disk(tmp111))
-winds <- unzip(tmp111) %>% read_csv() %>% clean_names()
+Do not include wind or barometric pressure.
 
+```{r download_meteor}
 tmp222 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_TEMP_2015.zip", write_disk(tmp222))
 temp <- unzip(tmp222) %>% read_csv() %>% clean_names()
-
-tmp333 <- tempfile()   
-GET("https://aqs.epa.gov/aqsweb/airdata/daily_PRESS_2015.zip", write_disk(tmp333))
-barometric_press <- unzip(tmp333) %>% read_csv() %>% clean_names()
 
 tmp444 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_RH_DP_2015.zip", write_disk(tmp444))
@@ -85,52 +75,80 @@ rh_dewpoint <- unzip(tmp444) %>% read_csv() %>% clean_names()
 
 ### Toxics, Precursors, and Lead
 
-```{r download_tox}
-tmp1111 <- tempfile()   
-GET("https://aqs.epa.gov/aqsweb/airdata/daily_HAPS_2015.zip", write_disk(tmp1111))
-haps <- unzip(tmp1111) %>% read_csv() %>% clean_names()
-
-tmp2222 <- tempfile()   
-GET("https://aqs.epa.gov/aqsweb/airdata/daily_VOCS_2015.zip", write_disk(tmp2222))
-vocs <- unzip(tmp2222) %>% read_csv() %>% clean_names()
-
-tmp3333 <- tempfile()   
-GET("https://aqs.epa.gov/aqsweb/airdata/daily_NONOxNOy_2015.zip", write_disk(tmp3333))
-nox <- unzip(tmp3333) %>% read_csv() %>% clean_names()
-
-tmp4444 <- tempfile()   
-GET("https://aqs.epa.gov/aqsweb/airdata/daily_LEAD_2015.zip", write_disk(tmp4444))
-lead <- unzip(tmp4444) %>% read_csv() %>% clean_names()
-```
+Do not include toxics, precursors, or lead.
 
 ## Merge
 
+Include criteria gases, PM2.5, PM2.5 species, temp, and relative humity.
+
+Restrict to NYC counties, POC = 1, and PM2.5 speciation from Kioumourtzoglou 2014 (https://www.nature.com/articles/jes20147#supplementary-information).
+
+BC  
+Na  
+Al  
+Si  
+S  
+Cl  
+Ca  
+Ti  
+V  
+Cr  
+Mn  
+Fe  
+Ni  
+Cu  
+Zn  
+Se  
+Br  
+Ba  
+Pb  
+
 ```{r merge}
-toxics <- rbind(rbind(rbind(haps, vocs), nox), lead) %>% 
-  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond"))
+meteor <- rbind(rh_dewpoint, temp) %>% 
+  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 
-meteor <- rbind(rbind(rbind(winds, temp), barometric_press), rh_dewpoint) %>% 
-  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond"))
-
-partic <- rbind(rbind(rbind(pm_25_FRM_FEM_mass, pm_25_non_FRM_FEM_mass), pm_10), pm_25_spec) %>% 
-  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond"))
+partic <- rbind(pm_25_FRM_FEM_mass, pm_25_spec) %>% 
+  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond") & parameter_name %in% c("Sodium PM2.5 LC",
+                                             "Aluminum PM2.5 LC",
+                                             "Barium PM2.5 LC",
+                                             "Bromine PM2.5 LC",
+                                             "Calcium PM2.5 LC",
+                                             "Chlorine PM2.5 LC",
+                                             "Chromium PM2.5 LC",
+                                             "Copper PM2.5 LC",
+                                             "Iron PM2.5 LC",
+                                             "Lead PM2.5 LC",
+                                             "Manganese PM2.5 LC",
+                                             "Selenium PM2.5 LC",
+                                             "Nickel PM2.5 LC",
+                                             "Selenium PM2.5 LC",
+                                             "Silicon PM2.5 LC",
+                                             "Sulfur PM2.5 LC",
+                                             "Titanium PM2.5 LC",
+                                             "Vanadium PM2.5 LC",
+                                             "Zinc PM2.5 LC",
+                                             "Black Carbon PM2.5 at 880 nm",
+                                             "PM2.5 - Local Conditions"))
 
 criteria <- rbind(rbind(rbind(ozone, so2), co), no2) %>% 
-  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond"))
+  filter(state_name == "New York" & county_name %in% c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
 
-all <- rbind(rbind(rbind(toxics, meteor), partic), criteria)
+all <- rbind(rbind(criteria, meteor), partic)
 
 all <- all %>% select(date_local, latitude, longitude, parameter_name, 
-               arithmetic_mean, x1st_max_value)
+               arithmetic_mean)
 
-aqs <- all %>% select(-x1st_max_value) %>% 
+aqs <- all %>%
   rename(date = date_local) %>% 
   group_by(date, parameter_name) %>% 
   summarize(mean = mean(arithmetic_mean)) %>% 
-  spread(parameter_name, mean) %>% clean_names()
+  spread(parameter_name, mean) %>% clean_names() %>% 
+  filter(!is.na(aluminum_pm2_5_lc))
 
 write_csv(aqs, "aqs_2015.csv")
 ```
+
+Restrict to every 3 days for PM2.5 species.
 
 ## Monitor Stations
 
