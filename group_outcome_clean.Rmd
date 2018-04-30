@@ -46,8 +46,10 @@ The unit of analysis is day, and confounders can only be variables that vary fro
 Temperature and relative humidity are also likely nonlinear confounders. For temperature we do lag 0 (same day) natural spline with df = 3, and average lag1-3 also ns with df = 3. For RH usually only lag0 ns df = 3. 
 
 ```{r cov}
-data <- data %>% 
+data_2015 <- data %>% 
   mutate(day_of_week = weekdays(date)) %>% select(day_of_week, everything())
+
+write_csv(data_2015, "data_2015.csv")
 ```
 
 ## Final Dataset

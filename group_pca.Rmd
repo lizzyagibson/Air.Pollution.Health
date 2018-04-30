@@ -17,76 +17,105 @@ library(leaflet)
 library(reshape2)
 library(ISLR)
 library(ggfortify)
+library(factoextra)
 ```
 
 ## PCA
 
 A low-dimensional representation of the data that captures as much of the information as possible. The idea is that each of the n observations lives in p-dimensional space, but not all of these dimensions are equally interesting. PCA seeks a small number of dimensions that are as interesting as possible, where the concept of interesting is measured by the amount that the observations vary along each dimension. Each of the dimensions found by PCA is a linear combination of the p features. The first two principal components of a data set span the plane that is closest to the n observations, in terms of average squared Euclidean distance.
 
-```{r data}
-#remove outcome and confounders from PCA matrix
-unsup <- data %>% select(-resp, -day_of_week, -outdoor_temperature, -relative_humidity, -date)
-```
-
 ```{r}
-pr.out <- prcomp(~ . , unsup, scale = TRUE, na.action = na.omit)
+#remove outcome and confounders from PCA matrix
+data_2015 <- read_csv("data_2015.csv")
+pca_dat <- data_2015 %>% select(-resp, -day_of_week, -Temp, -Humidity, -date) %>% as.data.frame()
+
+pr.out <- prcomp(~ . , pca_dat, scale = TRUE, na.action = na.omit)
 names(pr.out)
 
-pc_out_plot <- as.tibble(pr.out$x) %>% 
-  mutate(date = data[1:108,]$date) %>% 
-  mutate(day_of_week = data[1:108,]$day_of_week) %>% 
-  mutate(month = months(date)) 
+  pc_out_plot <- as.tibble(pr.out$x) %>% 
+  mutate(date = data_2015[1:108,]$date) %>% 
+  mutate(day_of_week = data_2015[1:108,]$day_of_week) %>% 
+  mutate(month = months(date)) %>% 
+  mutate(Week = ifelse(day_of_week %in% c("Saturday", "Sunday"), "Weekend", "Week day")) %>% 
+  mutate(Season = ifelse(month %in% c("January", "February", "December"), "Winter",
+                         ifelse(month %in% c("March", "April", "May"), "Spring",
+                                ifelse(month %in% c("June", "July", "August"), "Summer", "Fall"))))
 
 pc_out_load <- as.tibble(pr.out$rotation)
 
-pr.out$rotation
 pr.var = pr.out$sdev^2
-pr.var
 # variance explained by each PC
 
 pve = pr.var/sum(pr.var)
-pve
 # Percent Variance Explained
 
 percentage <- round(pve * 100, 2)
 percentage <- str_c(colnames(pr.out$x), " (", as.character(percentage), "%", ")")
+```
 
+### 1. Scree Plot
+```{r}
 #Scree plot
-plot(pve, xlab = "Principal Component", 
-     ylab = "Proportion of Variance Explained", ylim = c(0,1), type = 'b')
 #Elbow is at 3rd PC, meaning that the first 3 components explain most of the data
+fviz_eig(pr.out)
+```
 
+### 2. Variance Plot
+```{r}
 plot(cumsum(pve), xlab = "Principal Component", 
      ylab = "Cumulative Proportion of Variance Explained", ylim = c(0,1), type = 'b')
+```
 
+### 3. Heatmap
+```{r}
 #heatmap of pollutant loadings on PC
-autoplot(scale(pr.out$rotation))
+autoplot(scale(pr.out$rotation)) + labs(y = "Pollutants", x = "Principle Components", 
+                                        fill = "Value", 
+                                        title = "Individual pollutant loadings on principle components")
+```
 
-pr.out$center
-pr.out$scale
-pr.out$rotation
-# The kth column is the kth loading vector (phi)
+### 4. Variable Plot
+```{r}
+#Plot of eigenvectors
+# autoplot(pr.out, loadings = TRUE, loadings.colour = 'blue',
+#          loadings.label = TRUE, loadings.label.size = 3) + theme_bw() + 
+#   labs(title = "Biplot of first two principle components")
+#biplot of first 2 principle components
+#Graph of variables. Positive correlated variables point to the same side of the plot. Negative correlated variables point to opposite sides of the graph. longer (oranger) variables contribute more to the PC
+fviz_pca_var(pr.out,
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     # Avoid text overlapping
+             ) + labs(color = "Contribution")
+```
 
-dim(pr.out$x)
-head(pr.out$x)
-# The kth column is the kth PC score vector (z)
+### 5. Individual Plots
 
-biplot(pr.out, scale = 0)
-# scale=0: the arrows are scaled to represent the loadings
-autoplot(pr.out, loadings = TRUE) + theme_bw()
+#### Profile Similarity
+```{r}
+#Graph of individuals. Individuals with a similar profile are grouped together.
+fviz_pca_ind(pr.out,
+             col.ind = "cos2", # Color by the quality of representation
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE, label = "none",     # Avoid text overlapping
+             ) + labs(color = "Quality")
+```
 
-ggplot(pc_out_plot) + geom_point(aes(x = PC1, y = PC2, color = month)) + 
-  xlab(percentage[1]) + 
-  ylab(percentage[2]) +
-  theme_bw()
+#### Group by
+```{r}
+#Qualitative / categorical variables can be used to color individuals by groups. The grouping variable #should be of same length as the number of active individuals
+fviz_pca_ind(pr.out,
+             col.ind = pc_out_plot$Season, # color by groups
+             addEllipses = TRUE, # Concentration ellipses
+             ellipse.type = "confidence",
+             legend.title = "Season", label = "none")
 
-ggplot(pc_out_plot, aes(x = PC1, y = PC2, color = day_of_week)) + xlab(percentage[1]) + 
-  ylab(percentage[2]) +
-  geom_point() + theme_bw()
-
+fviz_pca_ind(pr.out,
+             col.ind = pc_out_plot$Week, # color by groups
+             addEllipses = TRUE, # Concentration ellipses
+             ellipse.type = "confidence",
+             legend.title = "Weekend", label = "none")
 ```
 
 The principal component score vectors have length n = 122 for 122 days, and the principal component loading vectors have length p = 23 for 23 criteria gases, particulates, and PM species measured. PCA was performed after standardizing each variable to have mean zero and standard deviation one.
 
-months -- seasons
-days of week -- week/end
