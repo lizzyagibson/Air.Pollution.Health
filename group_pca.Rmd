@@ -16,6 +16,7 @@ library(janitor)
 library(leaflet)
 library(reshape2)
 library(ISLR)
+library(ggfortify)
 ```
 
 ## PCA
@@ -24,18 +25,45 @@ A low-dimensional representation of the data that captures as much of the inform
 
 ```{r data}
 #remove outcome and confounders from PCA matrix
-unsup <- data %>% select(-resp, -day_of_week, 
-                         -outdoor_temperature, -relative_humidity, -date)
+unsup <- data %>% select(-resp, -day_of_week, -outdoor_temperature, -relative_humidity, -date)
 ```
 
 ```{r}
-pr.out <- prcomp(~ ., unsup, scale = TRUE, na.action = na.omit)
+pr.out <- prcomp(~ . , unsup, scale = TRUE, na.action = na.omit)
 names(pr.out)
 
+pc_out_plot <- as.tibble(pr.out$x) %>% 
+  mutate(date = data[1:108,]$date) %>% 
+  mutate(day_of_week = data[1:108,]$day_of_week) %>% 
+  mutate(month = months(date)) 
+
+pc_out_load <- as.tibble(pr.out$rotation)
+
+pr.out$rotation
+pr.var = pr.out$sdev^2
+pr.var
+# variance explained by each PC
+
+pve = pr.var/sum(pr.var)
+pve
+# Percent Variance Explained
+
+percentage <- round(pve * 100, 2)
+percentage <- str_c(colnames(pr.out$x), " (", as.character(percentage), "%", ")")
+
+#Scree plot
+plot(pve, xlab = "Principal Component", 
+     ylab = "Proportion of Variance Explained", ylim = c(0,1), type = 'b')
+#Elbow is at 3rd PC, meaning that the first 3 components explain most of the data
+
+plot(cumsum(pve), xlab = "Principal Component", 
+     ylab = "Cumulative Proportion of Variance Explained", ylim = c(0,1), type = 'b')
+
+#heatmap of pollutant loadings on PC
+autoplot(scale(pr.out$rotation))
+
 pr.out$center
-
 pr.out$scale
-
 pr.out$rotation
 # The kth column is the kth loading vector (phi)
 
@@ -45,32 +73,16 @@ head(pr.out$x)
 
 biplot(pr.out, scale = 0)
 # scale=0: the arrows are scaled to represent the loadings
+autoplot(pr.out, loadings = TRUE) + theme_bw()
 
-# The PCs are only unique up to a sign change
-pr.out$rotation = -pr.out$rotation
-pr.out$x = -pr.out$x
-biplot(pr.out, scale = 0)
+ggplot(pc_out_plot) + geom_point(aes(x = PC1, y = PC2, color = month)) + 
+  xlab(percentage[1]) + 
+  ylab(percentage[2]) +
+  theme_bw()
 
-pr.out$sdev
-# the standard deviation of each PC
-
-pr.var = pr.out$sdev^2
-pr.var
-# variance explained by each PC
-
-
-pve = pr.var/sum(pr.var)
-pve
-# PVE
-
-#Scree plot
-plot(pve, xlab = "Principal Component", 
-     ylab = "Proportion of Variance Explained", ylim = c(0,1), type = 'b')
-
-plot(cumsum(pve), xlab = "Principal Component", 
-     ylab="Cumulative Proportion of Variance Explained", ylim = c(0,1), type = 'b')
-a = c(1,2,8,-3)
-cumsum(a)
+ggplot(pc_out_plot, aes(x = PC1, y = PC2, color = day_of_week)) + xlab(percentage[1]) + 
+  ylab(percentage[2]) +
+  geom_point() + theme_bw()
 
 ```
 
