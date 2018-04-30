@@ -78,7 +78,6 @@ pm_25_spec <- unzip(tmp44) %>% read_csv() %>% clean_names() %>%
                                              "Iron PM2.5 LC",
                                              "Lead PM2.5 LC",
                                              "Manganese PM2.5 LC",
-                                             "Selenium PM2.5 LC",
                                              "Nickel PM2.5 LC",
                                              "Selenium PM2.5 LC",
                                              "Silicon PM2.5 LC",
@@ -144,14 +143,34 @@ partic <- rbind(pm_25_FRM_FEM_mass, pm_25_spec)
 criteria <- rbind(rbind(rbind(ozone, so2), co), no2)
 
 all <- rbind(rbind(criteria, meteor), partic) %>% 
-  select(date_local, latitude, longitude, parameter_name, arithmetic_mean)
+  select(date_local, latitude, longitude, parameter_name, arithmetic_mean) %>% 
+  mutate(parameter_name = fct_recode(parameter_name, 
+                                     "Sodium" = "Sodium PM2.5 LC",
+                                             "Aluminum" = "Aluminum PM2.5 LC",
+                                             "Barium" = "Barium PM2.5 LC",
+                                             "Bromine" = "Bromine PM2.5 LC",
+                                             "Calcium" = "Calcium PM2.5 LC",
+                                             "Chlorine" = "Chlorine PM2.5 LC",
+                                             "Chromium" = "Chromium PM2.5 LC",
+                                             "Copper" = "Copper PM2.5 LC",
+                                             "Iron" = "Iron PM2.5 LC",
+                                             "Lead" = "Lead PM2.5 LC",
+                                             "Manganese" = "Manganese PM2.5 LC",
+                                             "Nickel" = "Nickel PM2.5 LC",
+                                             "Selenium" = "Selenium PM2.5 LC",
+                                             "Silicon" = "Silicon PM2.5 LC",
+                                             "Sulfur" = "Sulfur PM2.5 LC",
+                                             "Titanium" = "Titanium PM2.5 LC",
+                                             "Vanadium" = "Vanadium PM2.5 LC",
+                                             "Zinc" = "Zinc PM2.5 LC",
+                                             "Black_Carbon" = "Black Carbon PM2.5 at 880 nm"))
 
 aqs <- all %>%
   rename(date = date_local) %>% 
   group_by(date, parameter_name) %>% 
   summarize(mean = mean(arithmetic_mean, na.rm = TRUE)) %>% 
-  spread(parameter_name, mean) %>% clean_names() %>% 
-  filter(!is.na(aluminum_pm2_5_lc))
+  spread(parameter_name, mean) %>% 
+  filter(!is.na(Aluminum))
 
 write_csv(aqs, "aqs_2015.csv")
 ```
