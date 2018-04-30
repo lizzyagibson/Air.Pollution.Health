@@ -184,6 +184,7 @@ aqs <- all %>%
   spread(parameter_name, mean) %>% 
   filter(!is.na(Aluminum))
 
+write_csv(all, "all_long.csv")
 write_csv(aqs, "aqs_2015.csv")
 ```
 
