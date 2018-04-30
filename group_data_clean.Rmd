@@ -114,7 +114,7 @@ Do not include toxics, precursors, or lead.
 
 ## Merge
 
-Include criteria gases, PM2.5, PM2.5 species, temp, and relative humity.
+Include criteria gases, PM2.5, PM2.5 species, temp, and relative humidity.
 
 Restrict to NYC counties, POC = 1, and PM2.5 speciation from Kioumourtzoglou 2014 (https://www.nature.com/articles/jes20147#supplementary-information).
 
