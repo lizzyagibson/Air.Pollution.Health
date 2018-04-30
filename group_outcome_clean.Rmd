@@ -34,7 +34,7 @@ sparcs <- read_csv("NYCInpatient.csv") %>% clean_names() %>%
 Merge NYC SPARCS hospital visit data from 2015 with EPA AQS exposure data.
 
 ```{r merge}
-aqs <- read_csv("aqs_2015.csv") %>% clean_names()
+aqs <- read_csv("aqs_2015.csv")
 
 data <-  right_join(sparcs, aqs, by = "date")
 ```
