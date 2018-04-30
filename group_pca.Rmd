@@ -20,13 +20,45 @@ library(ggfortify)
 library(factoextra)
 ```
 
+## EDA
+
+### PM 2.5 Species
+```{r}
+data_2015 <- read_csv("data_2015.csv")
+all_long <- read_csv("all_long.csv")
+
+all_long %>% filter(!(parameter_name %in% 
+                        c("Humidity", "Temp", "NO2", "PM2.5", "SO2", "Ozone", "CO"))) %>%
+  pull(arithmetic_mean) %>% summary()
+
+all_long %>% filter(!(parameter_name %in% c("Humidity", "Temp", "NO2", "PM2.5", "SO2", "Ozone", "CO"))) %>% 
+  ggplot(aes(x = parameter_name, y = arithmetic_mean, color = parameter_name)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  labs(y = "Concentration", x = "Pollutants", 
+       title = "PM 2.5 Species Concentrations") + coord_cartesian(ylim = c(0, 1.25))
+```
+
+### Criteria Gases & Particulates
+```{r}
+all_long %>% filter(parameter_name %in% 
+                        c("NO2", "PM2.5", "SO2", "Ozone", "CO")) %>%
+  pull(arithmetic_mean) %>% summary()
+
+all_long %>% filter(parameter_name %in% c("NO2", "PM2.5", "SO2", "Ozone", "CO")) %>% 
+  ggplot(aes(x = parameter_name, y = arithmetic_mean, color = parameter_name)) + 
+  geom_boxplot(outlier.shape = NA) + theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  labs(y = "Concentration", x = "Pollutants", 
+       title = "Criteria Gas & Particulate Concentrations") + coord_cartesian(ylim = c(0, 42))
+```
+
 ## PCA
 
 A low-dimensional representation of the data that captures as much of the information as possible. The idea is that each of the n observations lives in p-dimensional space, but not all of these dimensions are equally interesting. PCA seeks a small number of dimensions that are as interesting as possible, where the concept of interesting is measured by the amount that the observations vary along each dimension. Each of the dimensions found by PCA is a linear combination of the p features. The first two principal components of a data set span the plane that is closest to the n observations, in terms of average squared Euclidean distance.
 
 ```{r}
 #remove outcome and confounders from PCA matrix
-data_2015 <- read_csv("data_2015.csv")
 pca_dat <- data_2015 %>% select(-resp, -day_of_week, -Temp, -Humidity, -date) %>% as.data.frame()
 
 pr.out <- prcomp(~ . , pca_dat, scale = TRUE, na.action = na.omit)
