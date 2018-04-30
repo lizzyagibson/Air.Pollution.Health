@@ -88,3 +88,5 @@ ggplot(pc_out_plot, aes(x = PC1, y = PC2, color = day_of_week)) + xlab(percentag
 
 The principal component score vectors have length n = 122 for 122 days, and the principal component loading vectors have length p = 23 for 23 criteria gases, particulates, and PM species measured. PCA was performed after standardizing each variable to have mean zero and standard deviation one.
 
+months -- seasons
+days of week -- week/end
