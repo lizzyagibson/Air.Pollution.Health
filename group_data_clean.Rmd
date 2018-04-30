@@ -36,19 +36,25 @@ tmp2 <- tempfile()
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_42401_2015.zip", write_disk(tmp2))
 so2 <- unzip(tmp2) %>% read_csv() %>% clean_names() %>% 
   filter(state_name == "New York" & county_name %in% 
-           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1) %>% 
+  mutate(parameter_name = fct_recode(parameter_name, 
+                                     "SO2" = "Sulfur dioxide"))
 
 tmp3 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_42101_2015.zip", write_disk(tmp3))
 co <- unzip(tmp3) %>% read_csv() %>% clean_names() %>% 
   filter(state_name == "New York" & county_name %in% 
-           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1) %>%
+  mutate(parameter_name = fct_recode(parameter_name, 
+                                     "CO" = "Carbon monoxide"))
 
 tmp4 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_42602_2015.zip", write_disk(tmp4))
 no2 <- unzip(tmp4) %>% read_csv() %>% clean_names() %>% 
   filter(state_name == "New York" & county_name %in% 
-           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1) %>% 
+  mutate(parameter_name = fct_recode(parameter_name, 
+                                     "NO2" = "Nitrogen dioxide (NO2)"))
 ```
 
 ### Particulates
@@ -60,7 +66,9 @@ tmp11 <- tempfile()
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_88101_2015.zip", write_disk(tmp11))
 pm_25_FRM_FEM_mass <- unzip(tmp11) %>% read_csv() %>% clean_names() %>% 
   filter(state_name == "New York" & county_name %in% 
-           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1) %>% 
+  mutate(parameter_name = fct_recode(parameter_name, 
+                                     "PM2.5" = "PM2.5 - Local Conditions"))
 
 tmp44 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_SPEC_2015.zip", write_disk(tmp44))
@@ -98,13 +106,17 @@ tmp222 <- tempfile()
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_TEMP_2015.zip", write_disk(tmp222))
 temp <- unzip(tmp222) %>% read_csv() %>% clean_names() %>% 
   filter(state_name == "New York" & county_name %in% 
-           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1) %>% 
+  mutate(parameter_name = fct_recode(parameter_name, 
+                                     "Temp" = "Outdoor Temperature"))
 
 tmp444 <- tempfile()   
 GET("https://aqs.epa.gov/aqsweb/airdata/daily_RH_DP_2015.zip", write_disk(tmp444))
 rh_dewpoint <- unzip(tmp444) %>% read_csv() %>% clean_names() %>% 
   filter(state_name == "New York" & county_name %in% 
-           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1)
+           c("Queens", "Kings", "New York", "Bronx", "Richmond") & poc == 1) %>% 
+  mutate(parameter_name = fct_recode(parameter_name, 
+                                     "Humidity" = "Relative Humidity"))
 ```
 
 ### Toxics, Precursors, and Lead
