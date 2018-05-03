@@ -15,14 +15,25 @@ library(ggplot2)
 
 ```{r data}
 data_lasso = read_csv("data_2015.csv") %>% select(everything(), -Humidity, -day_of_week) %>% drop_na
+
+##visualizing variables
+x = model.matrix(resp~., data_lasso)[,-(1:2)]
+y = data_lasso$resp
+
+featurePlot(x = x,
+            y = y,
+            between = list(x = 1, y = 1), 
+            type = c("g", "p", "smooth"))
 ```
+
 
 ```{r train and test set}
 set.seed(1)
+##create train and test datasets
 train_set = data_lasso[sample(nrow(data_lasso), 80),]
 test_set = data_lasso[!row.names(data_lasso) %in% row.names(train_set),]
 
-##creating a matrix model
+##create a matrix model for train and test set
 x_train = model.matrix(resp ~., train_set)[,-(1:2)]
 y_train = train_set$resp
 
@@ -34,6 +45,9 @@ y_test = test_set$resp
 
 ```{r lasso}
 set.seed(2)
+lasso = glmnet(x_train, y_train, alpha = 1)
+plot(lasso, xvar = "lambda")
+
 ##use cross-validation to find best lambda value
 cv.lasso = cv.glmnet(x_train, y_train, alpha = 1)
 plot(cv.lasso)
@@ -52,6 +66,11 @@ lasso_MSE_train = mean((lasso.pred.train - y_train)^2)
 ##prediction and MSE using test dataset
 lasso.pred = predict(lasso.mod, s = best_lambda, newx = x_test)
 lasso_MSE_test = mean((lasso.pred - y_test)^2)
+
+```
+
+```{r visualizations}
+ggplot(data_lasso, aes())
 
 ```
 
