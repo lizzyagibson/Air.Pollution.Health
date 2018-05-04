@@ -38,7 +38,7 @@ y_test = test_set$resp
 ```
 
 
-```{r_boosted}
+```{r boosted}
 set.seed(8)
 boost.pm = gbm(resp ~ ., data = train_set, 
                 distribution = "poisson", 
@@ -47,12 +47,20 @@ boost.pm = gbm(resp ~ ., data = train_set,
                 shrinkage = 0.001) # depth should be 1
 summary(boost.pm) # ozone is extremely influential, followed by nickel and sulfur
 
+pred.boost.train = predict(boost.pm,
+                         n.trees = boost.pm$n.trees, 
+                         type = "response")
+
 pred.boost = predict(boost.pm, 
                          newdata = test_set,
                          n.trees = boost.pm$n.trees, 
                          type = "response") # this type returns counts for poisson distribution
 
 pred.boost.round = round(pred.boost)
+
+# Finding the training set error (MSE)
+boost_tmse = mean((pred.boost.train - train_set$resp)^2) 
+boost_tmse
 
 # Finding the test set error (MSE)
 boost_mse = mean((pred.boost - test_set$resp)^2) #contains true value from test data
