@@ -1,0 +1,69 @@
+---
+title: "boosted_rf"
+author: "Ahlam Abuawad"
+date: "5/2/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(gbm)
+library(tidyverse)
+library(caret)
+```
+
+```{r include = FALSE}
+data_2015 <- read_csv("data_2015.csv")
+all_long <- read_csv("all_long.csv")
+data_boost <- data_2015 %>% 
+  select(-day_of_week, -Humidity, -date) %>% 
+  as.data.frame() %>% 
+  drop_na()
+```
+
+
+```{r train and test set}
+set.seed(1)
+
+## Creating training and test datasets
+train_set = data_boost[sample(nrow(data_boost), 80),]
+test_set = data_boost[!row.names(data_boost) %in% row.names(train_set),]
+
+## Creating a matrix model for training and test sets
+x_train = model.matrix(resp ~., train_set)[,-(1:2)]
+y_train = train_set$resp
+
+x_test = model.matrix(resp ~., test_set)[,-(1:2)]
+y_test = test_set$resp
+```
+
+
+```{r_boosted}
+set.seed(8)
+boost.pm = gbm(resp ~ ., data = train_set, 
+                distribution = "poisson", 
+                n.trees = 5000, 
+                interaction.depth = 1, 
+                shrinkage = 0.001) # depth should be 1
+summary(boost.pm) # ozone is extremely influential, followed by nickel and sulfur
+
+pred.boost = predict(boost.pm, 
+                         newdata = test_set,
+                         n.trees = boost.pm$n.trees, 
+                         type = "response") # this type returns counts for poisson distribution
+
+pred.boost.round = round(pred.boost)
+
+# Finding the test set error (MSE)
+boost_mse = mean((pred.boost - test_set$resp)^2) #contains true value from test data
+boost_mse
+
+# Deviance score
+dev_score = round(-log(dpois(test_set$resp, lambda = pred.boost)), 2)
+
+compare = cbind(as.vector(test_set$resp), as.vector(pred.boost.round), as.vector(dev_score))
+rownames(compare) = colnames(test_set$resp); colnames(compare) = c("True", "Predicted", "Deviance Score")
+knitr::kable(compare, align = "c")
+
+```
+
