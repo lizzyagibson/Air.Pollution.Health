@@ -15,7 +15,7 @@ output:
 **Describe your data set. Provide proper motivation for your work.**
 **What questions are you trying to answer?**
 
-## INTRODUCTION 
+## Introduction 
 
 The World Health Organization has placed air pollution as the world’s largest environmental health risk factor. Air pollution is a leading environmental threat to the health of urban populations overall. Although clean air laws and regulations have improved the air quality in New York and most other large cities, several pollutants in the city’s air are at levels that are harmful. In the present study, we assessed the potential association between exposure to high levels of air pollution and risk for hospitalizations due to respiratory diseases in New York City for the year 2015. We leveraged data from the New York Statewide Planning and Research Cooperative System (SPARCS) and the Environmental Protection Agency’s Air Quality System (AQS) database. 
 
