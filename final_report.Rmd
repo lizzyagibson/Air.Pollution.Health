@@ -35,7 +35,7 @@ We chose PCA because the dataset contains a large amount of variables, and PCA w
 
 A heat map of the data reveals that PC1, which comprises most of the variability in the dataset (~35%), contains four out of five of the criteria air pollutants (PM 2.5, NO2, CO, and SO2). The fifth criteria air pollutant, ozone, was not in PC1 but did appear in the other PC's to varying extents. In fact, the plot of the eigenvectors shows that ozone is in a different dimensional space compared to all of the other variables in the dataset. NO2, CO, and SO2 are in a similar dimensional space, and PM 2.5 is more similar to those three criteria air pollutants, but is also in a different dimensional space. 
 
-In comparing week days and weekends, 
+In comparing week days and weekends, there is a bit of overlap in the PCA. 
 
 
 
