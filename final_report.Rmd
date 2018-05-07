@@ -73,12 +73,22 @@ Boosted random forests can help in classifying variables, similar to that of reg
 
 For one of our supervised analyses we use lasso. The predictor variables we use in this analysis are: total PM2.5 mass concentrations, ozone, sulfate, nitrate, aluminum, calcium, iron, silicon, lead, manganese, zinc, bromine, copper, nickel, sulfur, vanadium and temperature. Lasso is a variable selection method that yields sparse models, that is, models that are easier to interpret in comparison to ridge regression. This is due to the fact that depending on the choice of the lambda parameter (Figure 1), some of the coefficients will be exactly equal to zero which helps produce a more simplify model. It is also important to mention that lasso relies on a linear model and assumes noncorrelation between the variables. 
 
+****FIGURE 1 LAMBDA VALUES PIC
+
 For the analysis we split the data into a train and test dataset. We use the train dataset to fit the lasso model and find the best lambda value using cross-validation. Then use the test dataset to test the performance of our model. 
 
 **Results** 
 
 The best lambda value that we found through cross-validation is 4.479. In figure 2, we can also see that when testing multiple data values in the train dataset, the lambda value that produces the lower mean square error (MSE) is around 4. The lasso model with the lambda chosen by cross-validation contains only 10 variables which are presented in table 1. 
+
 The MSE from the prediction using the train dataset is 2177.17 and the MSE using the test dataset is 6587.115
+
+
+
+***FIGURE 2 BEST LAMBDA VALUE
+
+***TABLE 1 : VALUES FOR COEFFICIENTS 
+
 
 **If there were tuning parameters, how did you pick their values?**
 
