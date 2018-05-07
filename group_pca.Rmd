@@ -27,10 +27,6 @@ library(factoextra)
 data_2015 <- read_csv("data_2015.csv")
 all_long <- read_csv("all_long.csv")
 
-all_long %>% filter(!(parameter_name %in% 
-                        c("Humidity", "Temp", "NO2", "PM2.5", "SO2", "Ozone", "CO"))) %>%
-  pull(arithmetic_mean) %>% summary()
-
 all_long %>% filter(!(parameter_name %in% c("Humidity", "Temp", "NO2", "PM2.5", "SO2", "Ozone", "CO"))) %>% 
   ggplot(aes(x = parameter_name, y = arithmetic_mean, color = parameter_name)) + 
   geom_boxplot(outlier.shape = NA) + theme_bw() + 
@@ -41,10 +37,6 @@ all_long %>% filter(!(parameter_name %in% c("Humidity", "Temp", "NO2", "PM2.5", 
 
 ### Criteria Gases & Particulates
 ```{r}
-all_long %>% filter(parameter_name %in% 
-                        c("NO2", "PM2.5", "SO2", "Ozone", "CO")) %>%
-  pull(arithmetic_mean) %>% summary()
-
 all_long %>% filter(parameter_name %in% c("NO2", "PM2.5", "SO2", "Ozone", "CO")) %>% 
   ggplot(aes(x = parameter_name, y = arithmetic_mean, color = parameter_name)) + 
   geom_boxplot(outlier.shape = NA) + theme_bw() + 
@@ -102,9 +94,9 @@ plot(cumsum(pve), xlab = "Principal Component",
 ```{r}
 #heatmap of pollutant loadings on PC
 autoplot(scale(pr.out$rotation)) + 
-  labs(y = "Pollutants", x = "Principle Components", 
+  labs(y = "Pollutants", x = "Principal Components", 
                                         fill = "Value", 
-                                        title = "Individual pollutant loadings on principle components") +
+                                        title = "Individual pollutant loadings on Principal components") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
@@ -115,8 +107,8 @@ autoplot(scale(pr.out$rotation)) +
 #Plot of eigenvectors
 # autoplot(pr.out, loadings = TRUE, loadings.colour = 'blue',
 #          loadings.label = TRUE, loadings.label.size = 3) + theme_bw() + 
-#   labs(title = "Biplot of first two principle components")
-#biplot of first 2 principle components
+#   labs(title = "Biplot of first two Principal components")
+#biplot of first 2 Principal components
 #Graph of variables. Positive correlated variables point to the same side of the plot. Negative correlated variables point to opposite sides of the graph. longer (oranger) variables contribute more to the PC
 fviz_pca_var(pr.out,
              col.var = "contrib", # Color by contributions to the PC
@@ -129,13 +121,13 @@ fviz_pca_var(pr.out,
 ```{r}
 melted <- melt(pr.out$rotation[,1:23]) %>% 
   mutate(variable.group = ifelse(Var1 %in% c("CO", "SO2", "NO2", "Ozone"), "Criteria Gases",
-                                 ifelse(Var1 == "PM2.5", "Particulates", "PM Species")))
+                                 ifelse(Var1 == "PM2.5", "PM 2.5", "PM Species")))
  
 melted %>% filter(Var2 %in% c("PC1", "PC2", "PC3", "PC4")) %>% ggplot() +
   geom_bar(aes(x = Var1, y = value, fill = variable.group), stat = "identity") + theme_bw() +
   facet_wrap(~Var2) + theme(axis.text.x = element_text(angle = 90, hjust = 1), 
                             legend.position = "bottom") +
-    labs(y = "Value", x = "Pollutants", title = "Variable Loadings on Principle Components",
+    labs(y = "Value", x = "Pollutants", title = "Variable Loadings on Principal Components",
          fill = "Group")
 ```
 
