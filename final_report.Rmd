@@ -4,8 +4,10 @@ author: "Ahlam Abuawad, Lizzie Gibson, & Yanelli Nunez"
 date: "5/2/2018"
 output:
   html_document:
-    toc: true
-    toc_float: true
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
 ---
 
 **Describe your data set. Provide proper motivation for your work.**
