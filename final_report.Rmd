@@ -11,9 +11,21 @@ output:
 # Introduction
 
 **Describe your data set. Provide proper motivation for your work.**
-
-
 **What questions are you trying to answer?**
+
+###INTRODUCTION 
+The World Health Organization has place air pollution as the world’s largest environmental health risk factor. Air pollution is a leading environmental threat to the health of urban populations overall. Although, clean air laws and regulations have improved the air quality in New York and most other large cities, several pollutants in the city’s air are at levels that are harmful. In the present study, we assess the potential association between exposure to high levels of air pollution and risk for hospitalizations due to respiratory diseases in New York City for the year 2015. We leverage data from the New York Statewide Planning and Research Cooperative System (SPARCS) and the Environmental Protection Agency’s Air Quality System (AQS) database. 
+
+**Air pollution variables**
+We obtain air pollution data from the US EPA Air Quality (AQS) database, which have been extensively used in previous health studies. Specifically, we obtain daily data for total PM2.5 mass concentrations, ozone and the following species: sulfate, nitrate, aluminum, calcium, iron, silicon, lead, manganese, zinc, bromine, copper, nickel, sulfur, and vanadium
+
+**Outcome: Number of hospitalizations due to respiratory disease.** 
+The New York Department of Health Statewide Planning and Research Cooperative System (SPARCS) is a comprehensive data reporting system that collects information on hospital admissions and emergency department (ED) visits within New York State. The SPARCS dataset contains information on approximately 98% of all hospitalizations in non-federal acute care facilities regardless of insurance status. Information on patient characteristics, diagnoses, treatments, services and charges is also collected for each hospitalization or ED visit. Additionally, the dataset includes demographic information such as age, sex, race, and residential address. A unique patient ID is assigned to each person to allow for tracking hospitalizations or ED visits over time. We will use SPARCS data on hospital admission and ED visits from the years 2015 to determine the number of respiratory disease hospitalizations in New York City. 
+
+**Cofounders**
+Weather conditions influence air pollution levels by concentrating, diluting or chemically processing pollutants; therefore, we will include temperature in our analysis. Data for the temperature variable will be obtain from the AQS database (see description above).
+
+Through this study we aim to answer the question on whether exposure to high levels of air pollution increases the number of respiratory disease hospitalizations in New York City. For this, we will use a combination of supervised and unsupervised data analysis including lasso, random forest tree and principal component analysis. 
 
 
 **How did you prepare and clean the data?**
