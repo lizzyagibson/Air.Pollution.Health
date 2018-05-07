@@ -108,4 +108,3 @@ compare = cbind(as.vector(test_set$resp), as.vector(pred.boost.round100), as.vec
 rownames(compare) = colnames(test_set$resp); colnames(compare) = c("True", "Predicted for 100", "Deviance Score for 100", "Predicted for 1000", "Deviance Score for 1000")
 knitr::kable(head(compare), align = "c")
 ```
-
