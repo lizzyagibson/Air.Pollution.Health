@@ -146,12 +146,9 @@ In comparing week days and weekends, there is a bit of overlap in the PCA. In co
 ## Supervised Analysis
 
 **What predictor variables did you include?**
-
-All of the predictor variables from the cleaned dataset were used except for day of the week, humidity and date. 
-
 **What technique did you use, and why did you choose it? What assumptions, if any, are being made by using this technique?**
 
-For our supervised analyses we used boosted random forests and lasso. 
+All of the predictor variables from the cleaned dataset were used except for three variables were used in the supervised analyses (total PM 2.5 mass concentrations, ozone, sulfate, nitrate, aluminum, calcium, iron, silicon, lead, manganese, zinc, bromine, copper, nickel, sulfur, vanadium and temperature). The three variables excluded were day of the week, humidity and date. For our supervised analyses we used boosted random forests and lasso models. The dataset was split into a training and test sets in order to perform cross-validation for tuning parameters, fitting the models, and testing their performances.
 
 ### Boosted Random Forests
 
@@ -200,7 +197,7 @@ The plots above reveal that ozone has the highest relative influence on respirat
 
 ### Lasso
 
-For one of our supervised analyses we use lasso. The predictor variables we use in this analysis are: total PM 2.5 mass concentrations, ozone, sulfate, nitrate, aluminum, calcium, iron, silicon, lead, manganese, zinc, bromine, copper, nickel, sulfur, vanadium and temperature. Lasso is a variable selection method that yields sparse models, that is, models that are easier to interpret in comparison to ridge regression. This is due to the fact that depending on the choice of the lambda parameter (Figure 10), some of the coefficients will be exactly equal to zero which helps produce a more simplify model. It is also important to mention that lasso relies on a linear model and assumes noncorrelation between the variables. 
+For one of our supervised analyses we used lasso. Lasso is a variable selection method that yields sparse models, that is, models that are easier to interpret in comparison to ridge regression. This is due to the fact that depending on the choice of the lambda parameter (Figure 10), some of the coefficients will be exactly equal to zero which helps produce a more simplified model. It is also important to mention that lasso relies on a linear model and assumes noncorrelation between the variables. 
 
 <center>
 
@@ -213,13 +210,13 @@ For one of our supervised analyses we use lasso. The predictor variables we use 
 ![LAMBDA VALUES](./images/lambda values.png){width=65%}
 </center> <br>
 
-For the analysis we split the data into a train and test dataset. We use the train dataset to fit the lasso model and find the best lambda value using cross-validation. Then use the test dataset to test the performance of our model. 
+We use the train dataset to fit the lasso model and find the best lambda value using cross-validation. Then use the test dataset to test the performance of our model. 
 
 **Results** 
 
-The best lambda value that we found through cross-validation is 4.479. In Figure 11, we can also see that when testing multiple data values in the train dataset, the lambda value that produces the lower mean square error (MSE) is around 4. The lasso model with the lambda chosen by cross-validation contains only 10 variables which are presented in Table 3. 
+The best lambda value that we found through cross-validation is 4.479. In Figure 11, we can also see that when testing multiple data values in the training dataset, the lambda value that produces the lowest mean square error (MSE) is around 4. The lasso model with the lambda chosen by cross-validation contains only 10 variables which are presented in Table 3. 
 
-The MSE from the prediction using the train dataset is 2177.17 and the MSE using the test dataset is 6587.115.
+The MSE from the prediction using the training dataset is 2177.17 and the MSE using the test set is 6587.115.
 
 
 <center>
@@ -246,6 +243,10 @@ The MSE from the prediction using the train dataset is 2177.17 and the MSE using
 
 <center>
 
+## Conclusion
+
+As shown in Table 4 below, a comparison of the boosted and lasso test MSE's resulted with the lasso producing a suprisingly higher test set MSE. 
+
 **Table 4. Boosted Random Forest and Lasso Test MSEs**
 
 </center>
@@ -255,17 +256,10 @@ The MSE from the prediction using the train dataset is 2177.17 and the MSE using
 ![TABLE BOOSTED AND LASSO](./images/boosted_lasso_table.png){width=40%}
 </center> <br>
 
-As shown in Table 4, a comparison of the boosted and lasso test MSE's resulted in the lasso with a suprisingly higher test set MSE. 
-
-## Conclusion
-
+Although the boosted random forests resulted in a smaller test set MSE, this model is much less interpretable than the lasso model. All of the models reveal that ozone is an important factor in the counts of respiratory hospital admissions and ED visits. This corresponds with current literature that shows ozone's ability to damage the lungs once inhaled. Sulfur and PM 2.5 are also factors of interest. Furthermore, it is important to note that weekly and seasonal variability in exposures also impact respiratory hospital admissions and ED visits. In terms of policy interventions, these analyses confirm that...
 
 **How did you make your predictions?**
-
-
 **Can you explain anything about the nature of the relationship between the predictors in your model and the predictions themselves?**
-
-
 **What were your findings? Are they what you expect? What insights into the data can you make?**
 
 
