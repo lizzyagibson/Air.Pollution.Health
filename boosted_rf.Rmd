@@ -75,11 +75,11 @@ dev_score100 = round(-log(dpois(test_set$resp, lambda = pred.boost100)), 2)
 # Running boosted with 1000 iterations
 boost.pm = gbm(resp ~ ., data = train_set, 
                 distribution = "poisson", 
-                n.trees = 100, 
+                n.trees = 1000, 
                 interaction.depth = 1, 
                 shrinkage = 0.001) # depth should be 1 for additive model, # shrinkage is the learning rate and 0.001 is good for a small dataset and growing a lot of trees
 boost.pm
-summary(boost.pm) # ozone is extremely influential, followed by nickel and sulfur
+knitr::kable(summary(boost.pm)) # ozone is extremely influential, followed by nickel and sulfur
 
 pred.boost.train = predict(boost.pm,
                          n.trees = boost.pm$n.trees, 
