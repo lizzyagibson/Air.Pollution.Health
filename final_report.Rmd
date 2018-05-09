@@ -200,15 +200,13 @@ The MSE from the prediction using the training dataset is 2177.17 and the MSE us
 
 </center>
 
-<<<<<<< HEAD
-***FIGURE 2 BEST LAMBDA VALUE
-=======
+
 <br> <center>
 ![BEST LAMBDA VALUE](./images/Best_lambda.png){width=55%}
 </center> <br>
 
 <center>
->>>>>>> d7470d44f7ea55c1c510a4e8adafdc83ed47f271
+
 
 **Table 3. Lasso Variable Coefficients**
 
