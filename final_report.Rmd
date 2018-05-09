@@ -1,15 +1,15 @@
 ---
 title: 'Final Project: Air Pollution and Respiratory Health'
-subtitle: 'Data Science II'
 author: "Ahlam Abuawad, Lizzy Gibson, & Yanelli Nunez"
 date: "5/2/2018"
 output:
-  html_document:
-    toc: yes
-    toc_float: yes
   pdf_document:
     toc: yes
     toc_depth: 4
+  html_document:
+    toc: yes
+    toc_float: yes
+subtitle: Data Science II
 ---
 
 ```{r include = FALSE}
@@ -49,9 +49,9 @@ The unit of analysis in this example is day, thus confounders can only be variab
 
 Through this study we aim to answer the question of whether exposure to high levels of air pollution increases the number of respiratory disease hospitalizations in NYC. For this, we will use a combination of supervised and unsupervised data analyses including lasso, boosted random forest, and principal component analysis. 
 
-### Data Preparation
+## Data Preparation
 
-Exposure data were downloaded from the EPA AQS [website](https://aqs.epa.gov/aqsweb/airdata/download_files.html#Raw). We downloaded separate datasets for each criteria gas, PM 2.5, PM species, and temperature. Next, the data was cleaned using the `rTidy` philosophy to obtain a dataset with days as rows and corresponding pollutants as columns. As the PM speciation filters are expensive to analyze, they are only measured every three days. Thus, we restricted our analyses to every third day of 2015 when we had complete data (n = 108). We obtained the outcome data from SPARCS from a colleague. It includes counts of inpatient hospital or ED visits per day in NYC. As this data is de-identified, this analysis was exempt from IRB oversight. Exposure and outcome datasets were merged for final analyses. We created separate training and testing datasets to ensure rigor and reproducibility in our analyses.
+Exposure data were downloaded from the EPA AQS [website](https://aqs.epa.gov/aqsweb/airdata/download_files.html#Raw). We downloaded separate datasets for each criteria gas, PM 2.5, PM species, and temperature. Next, the data was cleaned using the `r print('Tidy')` philosophy to obtain a dataset with days as rows and corresponding pollutants as columns. As the PM speciation filters are expensive to analyze, they are only measured every three days. Thus, we restricted our analyses to every third day of 2015 when we had complete data (n = 108). We obtained the outcome data from SPARCS from a colleague. It includes counts of inpatient hospital or ED visits per day in NYC. As this data is de-identified, this analysis was exempt from IRB oversight. Exposure and outcome datasets were merged for final analyses. We created separate training and testing datasets to ensure rigor and reproducibility in our analyses.
 
 The code for data preparation, cleaning, and analyses can be found in our [GitHub repository](https://github.com/lizzyagibson/Air.Pollution.Health).
 
@@ -76,7 +76,7 @@ In the exploratory data analysis (EDA), the first boxplot (Figure 2a) of the PM 
 
 ### Principal Component Analysis
 
-For the unsupervised analysis, we also performed a Principal Component Analysis (PCA). This is a low-dimensional representation of the data that captures as much of the information as possible, to which each of the n observations exists in a p-dimensional space. PCA seeks a small number of dimensions that are all as "interesting" as possible (not all dimensions are equally interesting), which is measured by the amount that the observations vary along each dimension. Each of the dimensions found by PCA is a linear combination of the p features. The first two principal components (PC's) of a dataset span the plane that is closest to the n observations in terms of average squared Euclidean distance. PCA requires strong assumptions, including multiple continuous variables, a linear relationship between all variables, a large enough sample size, and no significant outliers (as PCA is very susceptible to outliers). We chose PCA because the dataset contains a large amount of correlated variables, and PCA will help to understand which variables comprise a majority of the variability in the data. The model fit was first assessed using Figures 3a and b shown below.
+For the unsupervised analysis, we also performed a Principal Component Analysis (PCA). This is a low-dimensional representation of the data that captures as much of the information as possible. PCA seeks a small number of dimensions that are all as "interesting" as possible (not all dimensions are equally interesting), which is measured by the amount that the observations vary along each dimension. Each of the dimensions found by PCA is a linear combination of the p original features. The first two principal components (PC's) of a dataset span the plane that is closest to the n observations in terms of average squared Euclidean distance. PCA requires continuous variables and some strong assumptions, including a linear relationship between all variables, a large enough sample size, and no significant outliers (as PCA is very susceptible to outliers). We chose PCA because the dataset contains a large amount of correlated variables, and PCA will help to understand which components comprise a majority of the variability in the data. The model fit was first assessed using Figures 3a and b shown below.
 
 <center>
 
@@ -89,7 +89,7 @@ For the unsupervised analysis, we also performed a Principal Component Analysis 
 ![SCREE PLOT](./images/figure_scree_plot.PNG){width=48%}![VARIANCE](./images/figure_variance.PNG){width=48%}
 </center> <br>
 
-The scree plot reveals that a majority of the variance in the data (~35%) was captured in the first principal component (PC1). The remaining 65% of the variance was captured by nine other PCs. 
+The scree plot reveals that a majority of the variance in the data (~35%) was captured in the first principal component (PC1). The remaining 65% of the variance was captured by nine other PCs. The "elbow" of the scree plot tells us that the first three components do a sufficient job of capturing the variability in the data (~60%).
 
 <center>
 
