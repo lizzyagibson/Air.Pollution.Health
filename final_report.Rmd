@@ -84,7 +84,6 @@ The best lambda value that we found through cross-validation is 4.479. In figure
 The MSE from the prediction using the train dataset is 2177.17 and the MSE using the test dataset is 6587.115
 
 
-
 ***FIGURE 2 BEST LAMBDA VALUE
 
 ***TABLE 1 : VALUES FOR COEFFICIENTS 
