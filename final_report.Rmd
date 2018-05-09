@@ -232,8 +232,4 @@ As shown in Table 4 below, a comparison of the boosted and lasso test MSE's resu
 
 Although the boosted random forests resulted in a smaller test set MSE, this model is much less interpretable than the lasso model. Because the lasso model is more interpretable, and because in this analysis we are interested in interpreting effects over predicting outcomes, we used the lasso model to make predictions. All of the models reveal that ozone is an important factor in predicting the number of respiratory hospital admissions and ED visits per day. This corresponds with current literature that shows ozone's ability to damage the lungs once inhaled. Sulfur and PM 2.5 are also factors of interest. The PCA showed grouping of most PM 2.5 species together, and a strong separation from ozone, which is what we would expect. Furthermore, it is important to note for the supervised analyses that weekly and seasonal variability in exposures also impact respiratory hospital admissions and ED visits. In terms of policy interventions, these analyses are still preliminary and are the first steps toward assessing the association between exposure to high levels of air pollution and the amount of respiratory disease hospitalizations in NYC. This analysis shows how data science methods -- including dimension reduction, variable selection, tree-based methods, and cross-validation -- can be used for rigorous and reproducible hypothesis generation and testing in the environmental health sciences.
 
-**How did you make your predictions?**
-**Can you explain anything about the nature of the relationship between the predictors in your model and the predictions themselves?**
-**What were your findings? Are they what you expect? What insights into the data can you make?**
-
 
