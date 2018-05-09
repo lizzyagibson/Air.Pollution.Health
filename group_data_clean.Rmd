@@ -15,6 +15,9 @@ library(httr)
 library(janitor)
 library(leaflet)
 library(reshape2)
+library(ggmap)
+library(maps)
+library(mapdata)
 ```
 
 # Clean Data
@@ -197,4 +200,10 @@ all %>% select(latitude, longitude) %>% unique() %>%
   leaflet() %>% 
   addProviderTiles(providers$CartoDB.Positron) %>% 
   addCircles(~longitude, ~latitude, color = "red")
+
+nyc_map <- get_map(location = c(lon = -74.00, lat = 40.71), maptype = "terrain", zoom = 11)
+
+ggmap(nyc_map) + geom_point(data = all, aes(x = longitude, y = latitude), color = "red") + 
+  labs(title = "Map of Monitor Stations across NYC", x = "Longitude", y = "Latitude")
 ```
+
